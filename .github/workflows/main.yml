@@ -384,23 +384,20 @@ jobs:
         run: |
           Write-Host "🧹 ĐANG DỌN DẸP HỆ THỐNG..." -ForegroundColor Yellow
           try {
-              # Ngắt kết nối và đăng xuất hoàn toàn khỏi Tailscale
-              & "$env:ProgramFiles\Tailscale\tailscale.exe" logout -ErrorAction SilentlyContinue
-              & "$env:ProgramFiles\Tailscale\tailscale.exe" down --accept-risk=all -ErrorAction SilentlyContinue
+              # Dừng Job monitor trước để tránh xung đột log
+              Get-Job -Name "SystemMonitor" | Stop-Job -ErrorAction SilentlyContinue
+              Get-Job -Name "SystemMonitor" | Remove-Job -Force -ErrorAction SilentlyContinue
               
-              # Dừng tất cả các tác vụ chạy ngầm (Monitor)
-              Get-Job | Stop-Job -ErrorAction SilentlyContinue
-              Get-Job | Remove-Job -Force -ErrorAction SilentlyContinue
+              # Lệnh Tailscale chuẩn không có -ErrorAction
+              # 2>$null dùng để ẩn các thông báo lỗi nếu lệnh thất bại
+              & "$env:ProgramFiles\Tailscale\tailscale.exe" logout 2>$null
+              & "$env:ProgramFiles\Tailscale\tailscale.exe" down --accept-risk=all 2>$null
               
-              # Xóa file mật khẩu tạm
               if (Test-Path "$env:TEMP\rdp_password.txt") { 
-                  Remove-Item "$env:TEMP\rdp_password.txt" -Force 
+                  Remove-Item "$env:TEMP\rdp_password.txt" -Force -ErrorAction SilentlyContinue
               }
               
-              Write-Host "✅ Dọn dẹp hoàn tất an toàn!" -ForegroundColor Green
+              Write-Host "🎉 Dọn dẹp hoàn tất! Hẹn gặp lại! 👋" -ForegroundColor Green
           } catch {
-              Write-Host "⚠️ Có lỗi nhỏ khi dọn dẹp nhưng hệ thống vẫn đóng an toàn." -ForegroundColor Yellow
+              Write-Host "⚠️ Bỏ qua lỗi dọn dẹp." -ForegroundColor Yellow
           }
-          
-          Write-Host ""
-          Write-Host "🎉 Dọn dẹp hoàn tất! Hẹn gặp lại! 👋" -ForegroundColor Green 
