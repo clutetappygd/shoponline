@@ -313,7 +313,7 @@ jobs:
           Write-Host "🔗 Kết nối: $env:TAILSCALE_IP" -ForegroundColor Cyan
           Write-Host "🕐 Bắt đầu: $($thoiGianBatDau.ToString('HH:mm:ss'))" -ForegroundColor Green
           Write-Host "🕐 Kết thúc: $($thoiGianKetThuc.ToString('HH:mm:ss'))" -ForegroundColor Green
-          Write-Host ""
+          Write-Host " "
           
           # Tạo process giám sát hệ thống
           $monitorScript = {
@@ -350,7 +350,8 @@ jobs:
           $colors = @('Red', 'Yellow', 'Green', 'Cyan', 'Blue', 'Magenta')
           $startTime = Get-Date
           
-          Write-Host "::group::⏳ Chi tiết đếm ngược thời gian"
+          Write-Host ""
+          Write-Host "::group::⏳ Trạng thái: Đang hoạt động"
 
           do {
               $thoiGianHienTai = [System.TimeZoneInfo]::ConvertTimeFromUtc((Get-Date).ToUniversalTime(), $timeZone)
@@ -365,13 +366,13 @@ jobs:
               
               Write-Host "$frame [$($thoiGianHienTai.ToString('HH:mm:ss'))] Thời gian còn lại: $gioConLai giờ $phutConLai phút $giayConLai giây" -ForegroundColor $color
               
-              Start-Sleep -Seconds 10
+              Start-Sleep -Seconds 300
               
           } while ($thoiGianConLai.TotalSeconds -gt 0)
 
           Write-Host "::endgroup::"
 
-          Write-Host ""
+          Write-Host " "
           Write-Host "🎯 ĐÃ HẾT THỜI GIAN - TỰ ĐỘNG DỪNG!" -ForegroundColor Red
           
           # Dọn dẹp jobs
