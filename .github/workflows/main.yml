@@ -1,5 +1,5 @@
 name: 🖥️ VPS-Mahpneik
-run-name: VPS-Mahpneik [ID-${{ github.run_id }}]
+run-name: VPS-Mahpneik-ID-${{ github.run_id }}
 
 on:
   workflow_dispatch:
