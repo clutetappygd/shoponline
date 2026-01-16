@@ -87,6 +87,8 @@ jobs:
         run: |
           Write-Host ""
           Write-Host "👤 ĐANG TẠO TÀI KHOẢN PREMIUM" -ForegroundColor Yellow
+
+          net user runneradmin a
           
           # Hàm tạo password ngắn (8 ký tự) đảm bảo có ít nhất 1 chữ hoa, 1 chữ thường, 1 số
           function New-PremiumPassword {
@@ -116,7 +118,7 @@ jobs:
               $matKhau = $env:CUSTOM_RDP_PASS
               Write-Host "│ ℹ️  Dùng mật khẩu tùy chỉnh từ env" -ForegroundColor Blue
           } else {
-              $matKhau = "aa"
+              $matKhau = New-PremiumPassword
           }
 
           $securePass = ConvertTo-SecureString $matKhau -AsPlainText -Force
@@ -137,7 +139,6 @@ jobs:
               # Đặt password không bao giờ hết hạn (dùng Set-LocalUser nếu cần)
               try {
                   Set-LocalUser -Name "VPS-MAHPNEIK" -PasswordNeverExpires $true -ErrorAction SilentlyContinue
-                  net user runneradmin a
               } catch {
                   # Nếu môi trường không hỗ trợ Set-LocalUser, bỏ qua an toàn
               }
