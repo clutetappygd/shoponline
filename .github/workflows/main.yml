@@ -1,4 +1,4 @@
-name: 🖥️ Sever Premium
+name: 🚀 Sever Premium
 run-name: VPS-Mahpneik [CLU-${{ github.run_number }}] 
 
 on:
@@ -55,9 +55,12 @@ jobs:
                   Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "SecurityLayer" -Value 0 -Force
                   Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 0 -Force
               }},
-              @{Name="Mở port 3389 firewall"; Script={
+              @{Name="Mở port 3389 và 41641 firewall"; Script={
                   netsh advfirewall firewall add rule name="RDP-Premium" dir=in action=allow protocol=TCP localport=3389 profile=any
                   netsh advfirewall firewall add rule name="RDP-Premium-Out" dir=out action=allow protocol=TCP localport=3389 profile=any
+
+                  netsh advfirewall firewall add rule name="Tailscale-Direct" dir=in action=allow protocol=UDP localport=41641 profile=any
+                  netsh advfirewall firewall add rule name="Tailscale-Direct-Out" dir=out action=allow protocol=UDP localport=41641 profile=any
               }},
               @{Name="Khởi động dịch vụ"; Script={
                   Set-Service -Name TermService -StartupType Automatic -ErrorAction SilentlyContinue
@@ -232,7 +235,7 @@ jobs:
           echo "RANID=$RANID" >> $env:GITHUB_ENV
 
           try {
-              & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=$env:TAILSCALE_AUTH_KEY --hostname=VPS-Mahpneik-ID$RANID --accept-routes --accept-dns --reset
+              & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=$env:TAILSCALE_AUTH_KEY --hostname=VPS-Mahpneik-ID$RANID --accept-routes --accept-dns --reset --force-reauth --state=mem:
               Write-Host "│ ✅ Kết nối Tailscale thành công" -ForegroundColor Green
           } catch {
               Write-Host "│ ❌ Lỗi kết nối Tailscale" -ForegroundColor Red
