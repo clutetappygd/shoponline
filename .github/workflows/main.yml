@@ -88,7 +88,19 @@ jobs:
           Write-Host ""
           Write-Host "👤 ĐANG TẠO TÀI KHOẢN PREMIUM" -ForegroundColor Yellow
 
+          # 1. Xuất cấu hình bảo mật hiện tại ra file
+          secedit /export /cfg config.inf
+          
+          # 2. Sửa các thông số: Độ dài tối thiểu = 0, Độ phức tạp = Tắt
+          (Get-Content config.inf) -replace 'PasswordComplexity = 1', 'PasswordComplexity = 0' `
+                                   -replace 'MinimumPasswordLength = .+', 'MinimumPasswordLength = 0' | Set-Content config.inf
+          
+          # 3. Nạp lại cấu hình mới vào hệ thống
+          secedit /configure /db $env:windir\security\local.sdb /cfg config.inf /areas SECURITYPOLICY
+          
+          # 4. Bây giờ bạn có thể đặt mật khẩu 1 ký tự thoải mái
           net user runneradmin a
+
           
           # Hàm tạo password ngắn (8 ký tự) đảm bảo có ít nhất 1 chữ hoa, 1 chữ thường, 1 số
           function New-PremiumPassword {
@@ -118,7 +130,7 @@ jobs:
               $matKhau = $env:CUSTOM_RDP_PASS
               Write-Host "│ ℹ️  Dùng mật khẩu tùy chỉnh từ env" -ForegroundColor Blue
           } else {
-              $matKhau = New-PremiumPassword
+              $matKhau = "Mahpneik0912"
           }
 
           $securePass = ConvertTo-SecureString $matKhau -AsPlainText -Force
