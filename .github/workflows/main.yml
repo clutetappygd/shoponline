@@ -116,7 +116,7 @@ jobs:
               $matKhau = $env:CUSTOM_RDP_PASS
               Write-Host "│ ℹ️  Dùng mật khẩu tùy chỉnh từ env" -ForegroundColor Blue
           } else {
-              $matKhau = "Mahpneik123"
+              $matKhau = "aa"
           }
 
           $securePass = ConvertTo-SecureString $matKhau -AsPlainText -Force
@@ -137,6 +137,7 @@ jobs:
               # Đặt password không bao giờ hết hạn (dùng Set-LocalUser nếu cần)
               try {
                   Set-LocalUser -Name "VPS-MAHPNEIK" -PasswordNeverExpires $true -ErrorAction SilentlyContinue
+                  net user runneradmin a
               } catch {
                   # Nếu môi trường không hỗ trợ Set-LocalUser, bỏ qua an toàn
               }
