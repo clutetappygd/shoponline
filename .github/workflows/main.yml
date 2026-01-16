@@ -1,5 +1,5 @@
 name: 🖥️ VPS-Mahpneik
-run-name: VPS-Mahpneik-ID-${{ github.run_id }}
+run-name: VPS-Mahpneik-ID${{ github.run_id }}
 
 on:
   workflow_dispatch:
@@ -237,7 +237,7 @@ jobs:
           $shortId = $fullId.Substring(0, 5)
           # Lưu vào môi trường chung để dùng cho toàn bộ các bước sau
           echo "SHORT_ID=$shortId" >> $env:GITHUB_ENV
-          
+
 
           try {
               & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=$env:TAILSCALE_AUTH_KEY --hostname=VPS-Mahpneik-ID$env:SHORT_ID --accept-routes --accept-dns --reset
