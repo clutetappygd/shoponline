@@ -360,7 +360,8 @@ jobs:
           }
           
           # Chạy monitor trong background
-          Start-Job -ScriptBlock $monitorScript -Name "SystemMonitor"
+          
+          Start-Job -ScriptBlock { $monitorScript -Name "SystemMonitor" { Start-Sleep -Seconds 60 } }
           
           Write-Host ""
           Write-Host "::group::⏳ Trạng thái: Đang hoạt động..."
