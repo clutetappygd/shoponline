@@ -1,5 +1,5 @@
-name: 🖥️ VPS-Mahpneik
-run-name: VPS-Mahpneik-ID${{ github.run_id }}
+name: 🖥️ Sever Premium
+run-name: VPS-Mahpneik [CLU-${{ github.run_number }}] 
 
 on:
   workflow_dispatch:
@@ -231,16 +231,8 @@ jobs:
           # THÊM DÒNG NÀY ĐỂ LƯU BIẾN CHO CÁC BƯỚC SAU
           echo "RANID=$RANID" >> $env:GITHUB_ENV
 
-
-          # Lấy 5 số đầu tiên của run_id
-          $fullId = "${{ github.run_id }}"
-          $shortId = $fullId.Substring(0, 5)
-          # Lưu vào môi trường chung để dùng cho toàn bộ các bước sau
-          echo "SHORT_ID=$shortId" >> $env:GITHUB_ENV
-
-
           try {
-              & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=$env:TAILSCALE_AUTH_KEY --hostname=VPS-Mahpneik-ID$env:SHORT_ID --accept-routes --accept-dns --reset
+              & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=$env:TAILSCALE_AUTH_KEY --hostname=VPS-Mahpneik-ID$RANID --accept-routes --accept-dns --reset
               Write-Host "│ ✅ Kết nối Tailscale thành công" -ForegroundColor Green
           } catch {
               Write-Host "│ ❌ Lỗi kết nối Tailscale" -ForegroundColor Red
@@ -293,7 +285,7 @@ jobs:
           Write-Host "│           🎉 KẾT NỐI THÀNH CÔNG 🎉       │" -ForegroundColor Cyan
           Write-Host "├───────────────────────────────────────────┤" -ForegroundColor Cyan
           Write-Host "│ 🌐  Địa chỉ: $env:TAILSCALE_IP" -ForegroundColor White
-          Write-Host "│ 📋  Tên: VPS-Mahpneik-ID$($env:SHORT_ID)" -ForegroundColor White          
+          Write-Host "│ 📋  Tên: VPS-Mahpneik-ID$($env:RANID)" -ForegroundColor White          
           Write-Host "│ 👤  Tài khoản: VPS-MAHPNEIK" -ForegroundColor White
           Write-Host "│ 🔐  Mật khẩu: $matKhau" -ForegroundColor White
           Write-Host "│ ⏰  Thời lượng: $displayTime" -ForegroundColor White
