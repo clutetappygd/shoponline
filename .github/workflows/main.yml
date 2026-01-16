@@ -55,13 +55,12 @@ jobs:
                   Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "SecurityLayer" -Value 0 -Force
                   Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 0 -Force
               }},
-              @{Name="Mở port 3389 và 41641 firewall"; Script={
-                  netsh advfirewall firewall add rule name="RDP-Premium" dir=in action=allow protocol=TCP localport=3389 profile=any
-                  netsh advfirewall firewall add rule name="RDP-Premium-Out" dir=out action=allow protocol=TCP localport=3389 profile=any
-
-                  netsh advfirewall firewall add rule name="Tailscale-Direct" dir=in action=allow protocol=UDP localport=41641 profile=any
-                  netsh advfirewall firewall add rule name="Tailscale-Direct-Out" dir=out action=allow protocol=UDP localport=41641 profile=any
-              }},
+              @{Name="Mở port 41641 và 3389 firewall"; Script={
+              # Mở TCP cho RDP [cite: 9]
+                  netsh advfirewall firewall add rule name="RDP-TCP" dir=in action=allow protocol=TCP localport=3389 profile=any
+              # Mở UDP cho Tailscale Direct Connect [cite: 9]
+                  netsh advfirewall firewall add rule name="Tailscale-UDP" dir=in action=allow protocol=UDP localport=41641 profile=any
+}},
               @{Name="Khởi động dịch vụ"; Script={
                   Set-Service -Name TermService -StartupType Automatic -ErrorAction SilentlyContinue
                   Set-Service -Name UmRdpService -StartupType Automatic -ErrorAction SilentlyContinue
