@@ -235,7 +235,7 @@ jobs:
           echo "RANID=$RANID" >> $env:GITHUB_ENV
 
           try {
-              & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=$env:TAILSCALE_AUTH_KEY --hostname=VPS-Mahpneik-ID$RANID --accept-routes --accept-dns --reset --force-reauth --state=mem:
+              & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=$env:TAILSCALE_AUTH_KEY --hostname=VPS-Mahpneik-ID$RANID --accept-routes --accept-dns --reset
               Write-Host "│ ✅ Kết nối Tailscale thành công" -ForegroundColor Green
           } catch {
               Write-Host "│ ❌ Lỗi kết nối Tailscale" -ForegroundColor Red
