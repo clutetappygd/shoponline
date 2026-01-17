@@ -387,7 +387,7 @@ jobs:
               
               Write-Host "`r$frame [$($thoiGianHienTai.ToString('HH:mm:ss'))] Thời gian còn lại: $gioConLai giờ $phutConLai phút $giayConLai giây" -NoNewline -ForegroundColor $color
               
-              Start-Sleep -Seconds 600
+              Start-Sleep -Seconds 60
               
           } while ($thoiGianConLai.TotalSeconds -gt 0)
 
