@@ -288,7 +288,7 @@ jobs:
           # Chuyển đổi thời gian từ input sang phút
           $durationInput = "${{ github.event.inputs.duration }}"
           switch ($durationInput) {
-              "10m" { $totalMinutes = 60; $displayTime = "10 phút" }
+              "10m" { $totalMinutes = 10; $displayTime = "10 phút" }
               "1h" { $totalMinutes = 60; $displayTime = "1 giờ" }
               "2h" { $totalMinutes = 120; $displayTime = "2 giờ" }
               "3h" { $totalMinutes = 180; $displayTime = "3 giờ" }
@@ -330,8 +330,8 @@ jobs:
           
           Write-Host ""
           Write-Host "🔄 BẮT ĐẦU DUY TRÌ PHIÊN LÀM VIỆC..." -ForegroundColor Yellow
-          Write-Host "💎 Phiên: MAHPNEIK PREMIUM" -ForegroundColor Magenta
-          Write-Host "🔗 Kết nối: $env:TAILSCALE_IP" -ForegroundColor Cyan
+          Write-Host "📋 Tên: VPS-Mahpneik-ID$($env:RANID)" -ForegroundColor Magenta
+          Write-Host "🌐 Địa chỉ: $env:TAILSCALE_IP" -ForegroundColor Cyan
           Write-Host "🕐 Bắt đầu: $($thoiGianBatDau.ToString('HH:mm:ss'))" -ForegroundColor Green
           Write-Host "🕐 Kết thúc: $($thoiGianKetThuc.ToString('HH:mm:ss'))" -ForegroundColor Green
           Write-Host " "
@@ -350,3 +350,62 @@ jobs:
                       
                       Write-Host "[$($currentTime.ToString('HH:mm:ss'))] 📊 Trạng thái - RDP: $($termService.Status), Kết nối: $($rdpConnections.Count)" -ForegroundColor Blue
                       $lastLogTime = $currentTime
+                  }
+                  
+                  # Kiểm tra và khởi động lại dịch vụ nếu cần
+                  $termService = Get-Service -Name TermService -ErrorAction SilentlyContinue
+                  if ($termService.Status -ne 'Running') {
+                      Write-Host "[$($currentTime.ToString('HH:mm:ss'))] 🔄 Khởi động lại TermService..." -ForegroundColor Yellow
+                      Start-Service -Name TermService -ErrorAction SilentlyContinue
+                  }
+                  
+                  Start-Sleep -Seconds 30
+              }
+          }
+          
+          # Chạy monitor trong background
+          Start-Job -ScriptBlock $monitorScript -Name "SystemMonitor"
+          
+          Write-Host ""
+          Write-Host "::group::⏳ Trạng thái: Đang hoạt động..."
+
+          # Hiển thị timer chính
+          $frames = @('⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏')
+          $colors = @('Red', 'Yellow', 'Green', 'Cyan', 'Blue', 'Magenta')
+          $startTime = Get-Date
+
+          do {
+              $thoiGianHienTai = [System.TimeZoneInfo]::ConvertTimeFromUtc((Get-Date).ToUniversalTime(), $timeZone)
+              $thoiGianConLai = $thoiGianKetThuc - $thoiGianHienTai
+              
+              $gioConLai = [math]::Max(0, [math]::Floor($thoiGianConLai.TotalHours))
+              $phutConLai = [math]::Max(0, [math]::Floor($thoiGianConLai.TotalMinutes % 60))
+              $giayConLai = [math]::Max(0, [math]::Floor($thoiGianConLai.TotalSeconds % 60))
+              
+              $frame = $frames[([int]((Get-Date) - $startTime).TotalSeconds) % $frames.Length]
+              $color = $colors[([int]((Get-Date) - $startTime).TotalMinutes) % $colors.Length]
+              
+              Write-Host "`r$frame [$($thoiGianHienTai.ToString('HH:mm:ss'))] Thời gian còn lại: $gioConLai giờ $phutConLai phút $giayConLai giây" -NoNewline -ForegroundColor $color
+              
+              Start-Sleep -Seconds 600
+              
+          } while ($thoiGianConLai.TotalSeconds -gt 0)
+
+          Write-Host "::endgroup::"
+
+          Write-Host " "
+          Write-Host "🎯 ĐÃ HẾT THỜI GIAN - TỰ ĐỘNG DỪNG!" -ForegroundColor Red
+          
+          # Dọn dẹp jobs
+          Get-Job -Name "SystemMonitor" -ErrorAction SilentlyContinue | Stop-Job -PassThru | Remove-Job -Force
+
+      # DỌN DẸP CHUYÊN NGHIỆP
+      - name: 🧹 DỌN DẸP HỆ THỐNG
+        if: always() 
+        run: |
+          # Đăng xuất Tailscale để giải phóng thiết bị
+          & "C:\Program Files\Tailscale\tailscale.exe" logout 2>$null
+          & "C:\Program Files\Tailscale\tailscale.exe" down 2>$null
+          
+          Write-Host " "
+          Write-Host "🎉 Dọn dẹp hoàn tất! Hẹn gặp lại! 👋" -ForegroundColor Green 
